@@ -3,7 +3,8 @@ out
 .gradle
 build.gradle
 gradlew
-gradlew,bat
+*.bat
 build
 gradle
 settings.gradle
+*.iml
