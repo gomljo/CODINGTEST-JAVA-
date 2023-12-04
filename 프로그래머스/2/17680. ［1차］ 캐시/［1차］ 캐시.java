@@ -1,25 +1,16 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class Solution {
 
-    public static boolean isExists(List<CacheObject> cache, String city, int time){
-        for (CacheObject object: cache) {
-            if(object.getName().equals(city)){
-                object.changeTime(time);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int solution(int cacheSize, String[] cities) {
+   public int solution(int cacheSize, String[] cities) {
         int answer = 0;
+
         if(cacheSize==0){
             return cities.length * 5;
         }
-        List<CacheObject> cache = new ArrayList<>(cacheSize);
+
+        PriorityQueue<CacheObject> cache = new PriorityQueue<>(
+                (object1, object2) -> Integer.compare(object1.getReferenceTime(), object2.getReferenceTime()));
         int hit = 1;
         int miss = 5;
         for (int i=0; i<cities.length; i++) {
@@ -29,27 +20,31 @@ public class Solution {
                 answer += miss;
                 continue;
             }
-            boolean isHit = isExists(cache, city, i);
-            if(!isHit){
-                if(cache.size() < cacheSize){
-                    cache.add(new CacheObject(city, i));
-                } else if (cache.size() == cacheSize) {
-                    cache.sort(Comparator.comparing(CacheObject::getReferenceTime));
-                    cache.remove(0);
-                    cache.add(new CacheObject(city, i));
+            CacheObject cacheObject = new CacheObject(city, i);
+            if (!cache.contains(cacheObject)) {
+                if (cache.size() >= cacheSize) {
+                    cache.poll();
                 }
-                else {
-                    System.out.println("error!");
-                }
+                cache.add(cacheObject);
                 answer += miss;
-            }
-            else {
-                answer+=hit;
+            }  else {
+                PriorityQueue<CacheObject> temporary = new PriorityQueue<>(
+                        (object1, object2) -> Integer.compare(object1.getReferenceTime(), object2.getReferenceTime()));
+                while (!cache.isEmpty() && !cache.peek().getName().equals(city)){
+                    temporary.add(cache.poll());
+                }
+                
+                if(!cache.isEmpty()){
+                    CacheObject update = cache.poll();
+                    update.changeTime(i);
+                    temporary.add(update);
+                    temporary.addAll(cache);
+                }
+                cache = temporary;
+                answer += hit;
             }
 
         }
-
-        System.out.println(answer);
 
         return answer;
     }
@@ -74,6 +69,16 @@ class CacheObject {
 
     public void changeTime(int time){
         this.referenceTime = time;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof CacheObject))
+            return false;
+        CacheObject cacheObject = (CacheObject) obj;
+        return Objects.equals(this.name, cacheObject.getName());
     }
 
 }
