@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 public class Main {
     private static int numberOfBrokenEgg = 0;
+    private static int[][] eggs;
+    private static int NUMBER_OF_EGG;
 
     public static void simulate(int depth, int[][] eggs, int crashed) {
         if (depth == eggs.length) {
@@ -35,7 +37,7 @@ public class Main {
                             simulate(depth + 1, modifiedEggs, crashed + 1);
                         } else if (modifiedEggs[i][0] > 0 && modifiedEggs[depth][0] <= 0) {
                             simulate(depth + 1, modifiedEggs, crashed + 1);
-                        } else {;
+                        } else {
                             simulate(depth + 1, modifiedEggs, crashed);
                         }
                     } else {
@@ -46,22 +48,69 @@ public class Main {
         }
     }
 
+    public static void simulateBetter(int idx, int cnt) {
+
+        if (idx == NUMBER_OF_EGG) {
+            numberOfBrokenEgg = Math.max(numberOfBrokenEgg, cnt);
+            return;
+        }
+
+        if(eggs[idx][0] <= 0 || cnt == NUMBER_OF_EGG-1) {
+            // 다음 계란을 들어 봄
+            simulateBetter(idx + 1, cnt);
+            return;
+        }
+        int currentCnt = cnt;
+        for (int i = 0; i < NUMBER_OF_EGG; i++) {
+
+            if (i == idx) {
+                continue;
+            }
+
+            if (eggs[i][0] <= 0) {
+                continue;
+            }
+
+            crash(idx, i);
+
+            if (eggs[idx][0] <= 0) {
+                cnt++;
+            }
+
+            if (eggs[i][0] <= 0){
+                cnt++;
+            }
+            simulateBetter(idx+1, cnt);
+            recovery(idx, i);
+            cnt = currentCnt;
+
+        }
+
+
+    }
+
+    public static void recovery(int currentEggIndex, int otherEggIndex) {
+        eggs[currentEggIndex][0] += eggs[otherEggIndex][1];
+        eggs[otherEggIndex][0] += eggs[currentEggIndex][1];
+    }
+
+    public static void crash(int currentEggIndex, int otherEggIndex) {
+        eggs[currentEggIndex][0] -= eggs[otherEggIndex][1];
+        eggs[otherEggIndex][0] -= eggs[currentEggIndex][1];
+    }
+
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int numberOfEgg = Integer.parseInt(br.readLine());
-        if (numberOfEgg > 1) {
-            int[][] eggs = new int[numberOfEgg][2];
-            for (int i = 0; i < numberOfEgg; i++) {
-                eggs[i] = Arrays.stream(br.readLine().split(" "))
-                        .map(Integer::valueOf)
-                        .mapToInt(property -> property)
-                        .toArray();
-            }
-            simulate(0, eggs, 0);
-
-
+        NUMBER_OF_EGG = Integer.parseInt(br.readLine());
+        eggs = new int[NUMBER_OF_EGG][2];
+        for (int i = 0; i < NUMBER_OF_EGG; i++) {
+            eggs[i] = Arrays.stream(br.readLine().split(" "))
+                    .map(Integer::valueOf)
+                    .mapToInt(property -> property)
+                    .toArray();
         }
+        simulateBetter(0, 0);
         System.out.println(numberOfBrokenEgg);
     }
 }
