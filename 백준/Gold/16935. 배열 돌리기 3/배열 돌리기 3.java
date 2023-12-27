@@ -92,20 +92,7 @@ class ArrayOperator {
             System.out.println();
         }
     }
-
-    private void copy(int[][] operationResult) {
-        this.array = new int[operationResult.length][operationResult[0].length];
-        for (int i = 0; i < operationResult.length; i++) {
-            this.array[i] = operationResult[i].clone();
-        }
-    }
-
-    private void copyRotated(int[][] rotatedResult) {
-        this.array = new int[rotatedResult.length][rotatedResult[0].length];
-        for (int i = 0; i < rotatedResult.length; i++) {
-            this.array[i] = rotatedResult[i].clone();
-        }
-    }
+    
 
     private void swap(int rowIndexA, int rowIndexB, int columnIndexA, int columnIndexB) {
 
@@ -147,7 +134,7 @@ class ArrayOperator {
                 rightRotatedArray[j][rightRotatedArray[0].length - 1 - i] = row[j];
             }
         }
-        copyRotated(rightRotatedArray);
+        this.array = rightRotatedArray;
     }
 
     public void rotateLeftNinety() {
@@ -158,7 +145,7 @@ class ArrayOperator {
                 leftRotatedArray[j][i] = row[row.length - 1 - j];
             }
         }
-        copyRotated(leftRotatedArray);
+        this.array = leftRotatedArray;
     }
 
     public void rotateQuadraticLeft() {
@@ -175,7 +162,7 @@ class ArrayOperator {
                 }
             }
         }
-        copy(leftQuadraticArray);
+        this.array = leftQuadraticArray;
     }
 
     private int[] calculateCurrentIndex(int nQuadratic, int halfRow, int halfColumn) {
@@ -235,7 +222,7 @@ class ArrayOperator {
                 }
             }
         }
-        copy(rightQuadraticArray);
+        this.array = rightQuadraticArray;
     }
 
     private int[] calculateRightMovedIndex(int nQuadratic, int halfRow, int halfColumn) {
