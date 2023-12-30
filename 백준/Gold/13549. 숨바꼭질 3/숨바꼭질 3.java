@@ -1,45 +1,58 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
- 
-public class Main {    
- 
-    static int min = Integer.MAX_VALUE;
-    static int n, k;
-    static boolean[] visited;
-    static int max = 100000;
-    
-    public static void main(String args[]) {
-        Scanner scan = new Scanner(System.in);
-        
-        n = scan.nextInt();
-        k = scan.nextInt();
-        
-        visited = new boolean[max + 1];
-        bfs();
+
+public class Main {
+    private static int min = Integer.MAX_VALUE;
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] params = bufferedReader.readLine().split(" ");
+
+        int N = Integer.parseInt(params[0]);
+        int K = Integer.parseInt(params[1]);
+
+        Queue<Finder> queue = new LinkedList<>();
+        boolean[] visited = new boolean[100_000+1];
+        queue.offer(new Finder(N, 0));
+        while (!queue.isEmpty()) {
+
+            Finder current = queue.poll();
+            visited[current.getIndex()] = true;
+            if (current.getIndex() == K) {
+                min = Math.min(min, current.getTime());
+            }
+
+            if (current.getIndex() * 2 <= 100000 && !visited[current.getIndex()*2]) {
+                queue.offer(new Finder(current.getIndex() * 2, current.getTime()));
+            }
+            if (current.getIndex() + 1 <= 100000 && !visited[current.getIndex() + 1]) {
+                queue.offer(new Finder(current.getIndex() + 1, current.getTime()+1));
+            }
+            if (current.getIndex() - 1 >= 0 && !visited[current.getIndex() - 1]) {
+                queue.offer(new Finder(current.getIndex() - 1, current.getTime()+1));
+            }
+        }
         System.out.println(min);
     }
-    
-    public static void bfs() {
-        Queue<Node> q = new LinkedList<>();
-        q.offer(new Node(n, 0));
-        
-        while(!q.isEmpty()) {
-            Node node = q.poll();
-            visited[node.x] = true;
-            if(node.x == k) min = Math.min(min, node.time);
-            
-            if(node.x * 2 <= max && visited[node.x * 2] == false) q.offer(new Node(node.x * 2, node.time));
-            if(node.x + 1 <= max && visited[node.x + 1] == false) q.offer(new Node(node.x + 1, node.time + 1));
-            if(node.x - 1 >= 0 && visited[node.x - 1] == false) q.offer(new Node(node.x - 1, node.time + 1));
-        }
+}
+
+class Finder {
+    private final int index;
+    private final int time;
+
+    public Finder(int index, int time) {
+        this.index = index;
+        this.time = time;
     }
-    
-    public static class Node {
-        int x;
-        int time;
-        
-        public Node(int x, int time) {
-            this.x = x;
-            this.time = time;
-        }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public int getTime() {
+        return time;
     }
 }
