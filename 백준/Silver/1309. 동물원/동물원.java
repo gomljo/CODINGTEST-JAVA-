@@ -18,9 +18,9 @@ public class Main {
         int columnSize = sc.nextInt();
         int[][] cases = new int[columnSize + 1][NUMBER_OF_CASE];
         for (int i = 0; i < NUMBER_OF_CASE; i++) {
-            cases[0][i] = 1;
+            cases[1][i] = 1;
         }
-        for (int i = 1; i <= columnSize; i++) {
+        for (int i = 2; i <= columnSize; i++) {
             // 아무것도 배치하지 않은 상태
             cases[i][NO_ASSIGN] = ((cases[i - 1][NO_ASSIGN]) + (cases[i - 1][LEFT_ASSIGN]) + (cases[i - 1][RIGHT_ASSIGN])) % MOD;
             // 왼쪽에 배치하는 상태
@@ -28,6 +28,7 @@ public class Main {
             cases[i][RIGHT_ASSIGN] = ((cases[i - 1][NO_ASSIGN]) + (cases[i - 1][LEFT_ASSIGN])) % MOD;
             // 오른쪽에 배치하는 상태
         }
-        System.out.println(cases[columnSize][0]);
+        int answer = (cases[columnSize][NO_ASSIGN] + cases[columnSize][LEFT_ASSIGN] + cases[columnSize][RIGHT_ASSIGN]) % MOD;
+        System.out.println(answer);
     }
 }
