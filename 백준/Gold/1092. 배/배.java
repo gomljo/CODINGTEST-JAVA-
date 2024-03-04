@@ -7,64 +7,51 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int numberOfCrane = Integer.parseInt(br.readLine());
-        Integer[] cranes = new Integer[numberOfCrane];
+        int numberOfCrain = Integer.parseInt(br.readLine());
+        Integer[] crains = new Integer[numberOfCrain];
         StringTokenizer st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < numberOfCrane; i++) {
-            cranes[i] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < numberOfCrain; i++) {
+            crains[i] = Integer.parseInt(st.nextToken());
         }
-
+        Arrays.sort(crains, Comparator.reverseOrder());
         int numberOfCargo = Integer.parseInt(br.readLine());
-        List<Integer> cargo = new ArrayList<>();
+        List<Integer> cargos = new ArrayList<>();
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < numberOfCargo; i++) {
-            cargo.add(Integer.parseInt(st.nextToken()));
+            cargos.add(Integer.parseInt(st.nextToken()));
         }
+        cargos.sort(Comparator.reverseOrder());
 
-        Arrays.sort(cranes, Collections.reverseOrder());
-        cargo.sort(Comparator.reverseOrder());
-        if(cranes[0] < cargo.get(0)){
+        if(cargos.get(0) > crains[0]){
             System.out.println("-1");
             return;
         }
-        // 크레인으로 실을 수 없는 경우 => 크레인 갯수만큼
-        int answer = 0;
-        while (!cargo.isEmpty()){
-            int index = 0;
-            for (int i = 0; i < numberOfCrane;) {
-                if(index==cargo.size()){
+
+        int timeForLoad = 0;
+
+        while (!cargos.isEmpty()) {
+            int crainNumber = 0;
+            int cargoNumber = 0;
+
+            while (crainNumber < numberOfCrain){
+                if(cargoNumber==cargos.size()){
                     break;
                 }
-                if(cargo.get(index) <= cranes[i]){
-                    cargo.remove(index);
-                    i++;
+                if(crains[crainNumber] >= cargos.get(cargoNumber)){
+                    // 크레인이 들 수 있다면 화물을 적재(리스트에서 삭제)한 다음
+                    // 크레인의 작업물을 찾도록(크레인 번호를 증가) 화물을 찾는 크레인을 다음 크레인으로 변경
+                    cargos.remove(cargoNumber);
+                    crainNumber++;
                 }
                 else {
-                    index++;
+                    // 현재 크레인에 적합한 화물이 아니라면 다음 화물을 탐색
+                    cargoNumber++;
                 }
             }
-            answer++;
+            timeForLoad++;
         }
-        System.out.println(answer);
+        System.out.println(timeForLoad);
 
-    }
-
-    public static boolean isPossibleToShipping(Integer[] cargo, boolean[] shipped, int craneLimit) {
-        for (int i = 0; i < cargo.length; i++) {
-            if (!shipped[i] && cargo[i] <= craneLimit) {
-                shipped[i] = true;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isFinished(boolean[] shipped) {
-        for (boolean shipState : shipped) {
-            if (!shipState) {
-                return false;
-            }
-        }
-        return true;
+        br.close();
     }
 }
