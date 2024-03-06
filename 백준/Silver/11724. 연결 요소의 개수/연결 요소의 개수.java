@@ -29,7 +29,7 @@ public class Main {
         int answer = 0;
         for (int i = 1; i <= numberOfVertex; i++) {
             if (!visited[i]) {
-                findConnectedComponent(0, i);
+                findConnectedComponent(i);
                 answer++;
             }
         }
@@ -37,7 +37,7 @@ public class Main {
         br.close();
     }
 
-    public static void findConnectedComponent(int numberOfElement, int startNode) {
+    public static void findConnectedComponent(int startNode) {
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(new Node(startNode, 0));
