@@ -43,7 +43,7 @@ public class Main {
             attendanceList.put(name, attendance);
         }
         System.out.println(answer);
-
+        br.close();
     }
 
     public static int convertTime(String time) {
