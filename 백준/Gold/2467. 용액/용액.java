@@ -1,40 +1,46 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    private static final int ZERO = 0;
 
-        int n = sc.nextInt();
-        int[] liquid = new int[n];
-
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        int[] solutions = new int[n];
+        StringTokenizer st = new StringTokenizer(br.readLine());
         for (int i = 0; i < n; i++) {
-            liquid[i] = sc.nextInt();
+            solutions[i] = Integer.parseInt(st.nextToken());
         }
-
+        Arrays.sort(solutions);
         int start = 0;
-        int end = liquid.length - 1;
-        int min = Integer.MAX_VALUE;
-        int acid = 0;
-        int alkali = 0;
+        int end = n - 1;
+        int minDiff = Integer.MAX_VALUE;
+        int solution1 = 0;
+        int solution2 = 0;
         while (start < end) {
-            int sum = Math.abs(liquid[start] + liquid[end]);
-            if(sum <= min){
-                acid = liquid[start];
-                alkali = liquid[end];
-                min = sum;
+            int diff = Math.abs(solutions[start] + solutions[end]);
+
+            if (diff <= minDiff) {
+                minDiff = diff;
+                solution1 = solutions[start];
+                solution2 = solutions[end];
             }
-            if (Math.abs(liquid[start + 1] + liquid[end]) < sum) {
+
+            if(Math.abs(solutions[start+1] + solutions[end]) < diff){
                 start++;
-            } else if (Math.abs(liquid[start] + liquid[end-1]) < sum) {
+            } else if (Math.abs(solutions[start] + solutions[end-1]) < diff) {
                 end--;
-            }
-            else {
+            } else {
                 start++;
                 end--;
             }
         }
-        System.out.printf("%d %d\n", acid, alkali);
+        System.out.println(solution1 +" "+solution2);
+        br.close();
 
     }
 }
