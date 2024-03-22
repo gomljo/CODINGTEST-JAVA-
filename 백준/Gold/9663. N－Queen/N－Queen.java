@@ -1,85 +1,52 @@
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    private static int[][] chessBoard;
-    private static int possible = 0;
+    private static int size;
+    private static int count;
+    private static int[] chessBoard;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int size = scanner.nextInt();
-        int[][] chessBoard = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            chessBoard[0][i] = 1;
-            nQueen(0, i, chessBoard);
-            chessBoard[0][i] = 0;
-        }
-        System.out.println(possible);
-        scanner.close();
+        size = scanner.nextInt();
+        // chessBoard의 i번째 위치의 값은 체스 말을 놓는 열의 값이 된다.
+        chessBoard = new int[size];
+        nQueen(0);
+        System.out.println(count);
+
     }
 
-    public static void nQueen(int row, int column, int[][] chessBoard) {
-        if (row == chessBoard.length-1) {
-            possible++;
+    public static void nQueen(int row) {
+
+        if (row == size) {
+            count++;
             return;
         }
-        for (int j = 0; j < chessBoard.length; j++) {
-            if (j == column - 1 || j == column + 1 || j == column) {
-                continue;
-            }
-            if (isCheckMate(row + 1, j, chessBoard)) {
-                continue;
-            }
-            chessBoard[row+1][j] = 1;
-            nQueen(row + 1, j, chessBoard);
-            chessBoard[row+1][j] = 0;
-        }
 
+        for (int column = 0; column < size; column++) {
+            chessBoard[row] = column;
+
+            if (isPossible(row)) {
+                nQueen(row + 1);
+            }
+        }
 
     }
 
-    public static boolean isCheckMate(int row, int column, int[][] chessBoard) {
-        if (checkNorth(row, column, chessBoard)) {
-            return true;
-        }
-        if (checkNorthWest(row, column, chessBoard)) {
-            return true;
-        }
-        if (checkNorthEast(row, column, chessBoard)) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean checkNorth(int row, int column, int[][] chessBoard) {
-        while (row > 0) {
-            if (chessBoard[row - 1][column] == 1) {
-                return true;
+    public static boolean isPossible(int row) {
+        for (int i = 0; i < row; i++) {
+            // 같은 행에 두었던 적이 있는지
+            if (chessBoard[row] == chessBoard[i]) {
+                return false;
             }
-            row--;
-        }
-        return false;
-    }
-
-    public static boolean checkNorthEast(int row, int column, int[][] chessBoard) {
-        while (row > 0 && column < chessBoard.length - 1) {
-            if (chessBoard[row - 1][column + 1] == 1) {
-                return true;
+            // 대각선 상에 두었던 적이 있는지
+            // Math.abs(row -i) => 수직 길이
+            // Math.abs(chessBoard[row] - chessBoard[i] => 수평 길이
+            if (Math.abs(row - i) == Math.abs(chessBoard[row] - chessBoard[i])) {
+                return false;
             }
-            row--;
-            column++;
-        }
-        return false;
-    }
 
-    public static boolean checkNorthWest(int row, int column, int[][] chessBoard) {
-        while (row > 0 && column > 0) {
-            if (chessBoard[row - 1][column - 1] == 1) {
-                return true;
-            }
-            row--;
-            column--;
         }
-        return false;
+
+        return true;
     }
 }
