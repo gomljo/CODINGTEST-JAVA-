@@ -7,10 +7,13 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+    private static final int USE_BOMB = 1;
+    private static final int NOT_USE_BOMB = 0;
+    private static final int WALL = 1;
+    private static final int PATH = 0;
     private static int rowSize;
     private static int colSize;
     private static int[][] map;
-    private static int[][][] count;
     private static final int[][] MOVES = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     public static void main(String[] args) throws IOException {
@@ -28,11 +31,10 @@ public class Main {
     }
 
     public static int bfs(int row, int col) {
-        long distance = Long.MAX_VALUE;
         Queue<Block> queue = new LinkedList<>();
         queue.offer(new Block(row, col, 1, false));
         boolean[][][] visited = new boolean[rowSize][colSize][2];
-        visited[0][0][0] = true;
+        visited[0][0][NOT_USE_BOMB] = true;
         while (!queue.isEmpty()) {
             Block current = queue.poll();
             if (current.getRow() == rowSize - 1 && current.getCol() == colSize - 1) {
@@ -45,18 +47,18 @@ public class Main {
                     continue;
                 }
 
-                if (map[nextRow][nextCol] == 1 && !current.isBroken() && !visited[nextRow][nextCol][map[nextRow][nextCol]]) {
+                if (map[nextRow][nextCol] == WALL && !current.isBroken() && !visited[nextRow][nextCol][WALL]){
                     visited[nextRow][nextCol][map[nextRow][nextCol]] = true;
                     queue.offer(new Block(nextRow, nextCol, current.getDistance() + 1, true));
                 }
 
-                if(map[nextRow][nextCol] == 0){
-                    if(current.isBroken() && !visited[nextRow][nextCol][1]){
-                        visited[nextRow][nextCol][1] = true;
-                        queue.offer(new Block(nextRow, nextCol, current.getDistance()+1, true));
-                    } else if (!current.isBroken() && !visited[nextRow][nextCol][0]) {
-                        visited[nextRow][nextCol][0]= true;
-                        queue.offer(new Block(nextRow, nextCol, current.getDistance()+1, false));
+                if (map[nextRow][nextCol] == PATH) {
+                    if (current.isBroken() && !visited[nextRow][nextCol][USE_BOMB]) {
+                        visited[nextRow][nextCol][USE_BOMB] = true;
+                        queue.offer(new Block(nextRow, nextCol, current.getDistance() + 1, true));
+                    } else if (!current.isBroken() && !visited[nextRow][nextCol][NOT_USE_BOMB]) {
+                        visited[nextRow][nextCol][NOT_USE_BOMB] = true;
+                        queue.offer(new Block(nextRow, nextCol, current.getDistance() + 1, false));
                     }
                 }
 
