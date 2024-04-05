@@ -13,7 +13,6 @@ public class Main {
         int columnSize = Integer.parseInt(st.nextToken());
         int[][] map = new int[rowSize][columnSize];
         boolean[][] wallVisited = new boolean[rowSize][columnSize];
-        boolean[][] virusVisit = new boolean[rowSize][columnSize];
         List<Coordinate> possibleToWall = new ArrayList<>();
         List<Coordinate> virus = new ArrayList<>();
         for (int i = 0; i < rowSize; i++) {
@@ -26,12 +25,11 @@ public class Main {
                     wallVisited[i][j] = true;
                 } else {
                     virus.add(new Coordinate(i, j));
-                    virusVisit[i][j] = true;
                 }
                 map[i][j] = state;
             }
         }
-        VirusExpansionSimulator virusExpansionSimulator = new VirusExpansionSimulator(rowSize, columnSize, map, wallVisited, possibleToWall, virus, virusVisit);
+        VirusExpansionSimulator virusExpansionSimulator = new VirusExpansionSimulator(rowSize, columnSize, map, wallVisited, possibleToWall, virus);
         virusExpansionSimulator.simulate();
         System.out.println(virusExpansionSimulator.getSafeZoneArea());
         br.close();
@@ -45,13 +43,11 @@ class VirusExpansionSimulator {
     private final List<Coordinate> possibleToWall;
     private final List<Coordinate> virus;
     private final boolean[][] visited;
-    private final boolean[][] virusVisited;
     private int safeZoneArea;
     private static final int[][] MOVES = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     public VirusExpansionSimulator(int rowSize, int columnSize, int[][] map, boolean[][] visited,
-                                   List<Coordinate> possibleToWall, List<Coordinate> virus,
-                                   boolean[][] virusVisited) {
+                                   List<Coordinate> possibleToWall, List<Coordinate> virus) {
         this.rowSize = rowSize;
         this.columnSize = columnSize;
         this.map = map;
@@ -59,7 +55,6 @@ class VirusExpansionSimulator {
         this.safeZoneArea = 0;
         this.possibleToWall = possibleToWall;
         this.virus = virus;
-        this.virusVisited = virusVisited;
     }
 
     private boolean[][] copy(boolean[][] wantCopied) {
@@ -111,7 +106,7 @@ class VirusExpansionSimulator {
             if (!wallCheck[i] && !visited[next.getRow()][next.getColum()]) {
                 wallCheck[i] = true;
                 visited[next.getRow()][next.getColum()] = true;
-                makeWall(numberOfWall + 1, i+1, visited, wallCheck);
+                makeWall(numberOfWall + 1, i + 1, visited, wallCheck);
                 visited[next.getRow()][next.getColum()] = false;
                 wallCheck[i] = false;
             }
