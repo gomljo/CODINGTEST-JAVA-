@@ -6,15 +6,22 @@ import java.util.StringTokenizer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
-        int[][] table = new int[n+1][n+1];
+        int[][] table = new int[n + 1][n + 1];
         for (int i = 1; i <= n; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 1; j <= n; j++) {
-                table[i][j] = table[i][j-1] + Integer.parseInt(st.nextToken());
+                table[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                table[i][j] += table[i-1][j] + table[i][j-1] - table[i-1][j-1];
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -24,11 +31,7 @@ public class Main {
             int startY = Integer.parseInt(st.nextToken());
             int endX = Integer.parseInt(st.nextToken());
             int endY = Integer.parseInt(st.nextToken());
-            int sum = 0;
-            for (int j = startX; j <=endX ; j++) {
-                sum += table[j][endY] - table[j][startY-1];
-            }
-            sb.append(sum);
+            sb.append(table[endX][endY] - table[endX][startY-1] - table[startX-1][endY] + table[startX-1][startY-1]);
             sb.append("\n");
         }
         System.out.println(sb);
