@@ -15,13 +15,7 @@ public class Main {
         for (int i = 1; i <= n; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 1; j <= n; j++) {
-                table[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
-
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                table[i][j] += table[i-1][j] + table[i][j-1] - table[i-1][j-1];
+                table[i][j] = Integer.parseInt(st.nextToken())+table[i-1][j] + table[i][j-1] - table[i-1][j-1];
             }
         }
         StringBuilder sb = new StringBuilder();
