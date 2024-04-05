@@ -4,7 +4,6 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -12,53 +11,36 @@ public class Main {
         int rowSize = Integer.parseInt(st.nextToken());
         int columnSize = Integer.parseInt(st.nextToken());
         int[][] map = new int[rowSize][columnSize];
-        boolean[][] wallVisited = new boolean[rowSize][columnSize];
-        List<Coordinate> possibleToWall = new ArrayList<>();
-        List<Coordinate> virus = new ArrayList<>();
         for (int i = 0; i < rowSize; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < columnSize; j++) {
                 int state = Integer.parseInt(st.nextToken());
-                if (state == 0) {
-                    possibleToWall.add(new Coordinate(i, j));
-                } else if (state == 1) {
-                    wallVisited[i][j] = true;
-                } else {
-                    virus.add(new Coordinate(i, j));
-                }
                 map[i][j] = state;
             }
         }
-        VirusExpansionSimulator virusExpansionSimulator = new VirusExpansionSimulator(rowSize, columnSize, map, wallVisited, possibleToWall, virus);
-        virusExpansionSimulator.simulate();
-        System.out.println(virusExpansionSimulator.getSafeZoneArea());
+        VirusExpansionSimulatorVersion2 virusExpansionSimulatorVersion2 =new VirusExpansionSimulatorVersion2(rowSize, columnSize, map);
+        virusExpansionSimulatorVersion2.simulate();
+        System.out.println(virusExpansionSimulatorVersion2.getSafeZoneArea());
         br.close();
     }
 }
 
-class VirusExpansionSimulator {
+class VirusExpansionSimulatorVersion2 {
     private final int rowSize;
     private final int columnSize;
     private final int[][] map;
-    private final List<Coordinate> possibleToWall;
-    private final List<Coordinate> virus;
-    private final boolean[][] visited;
     private int safeZoneArea;
     private static final int[][] MOVES = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
-    public VirusExpansionSimulator(int rowSize, int columnSize, int[][] map, boolean[][] visited,
-                                   List<Coordinate> possibleToWall, List<Coordinate> virus) {
+    public VirusExpansionSimulatorVersion2(int rowSize, int columnSize, int[][] map) {
         this.rowSize = rowSize;
         this.columnSize = columnSize;
         this.map = map;
-        this.visited = visited;
         this.safeZoneArea = 0;
-        this.possibleToWall = possibleToWall;
-        this.virus = virus;
     }
 
-    private boolean[][] copy(boolean[][] wantCopied) {
-        boolean[][] newVisited = new boolean[rowSize][columnSize];
+    private int[][] copy(int[][] wantCopied) {
+        int[][] newVisited = new int[rowSize][columnSize];
         for (int i = 0; i < rowSize; i++) {
             System.arraycopy(wantCopied[i], 0, newVisited[i], 0, columnSize);
         }
@@ -66,53 +48,26 @@ class VirusExpansionSimulator {
     }
 
     public void simulate() {
-
-        boolean[] wallCheck = new boolean[this.possibleToWall.size()];
-        for (int i = 0; i < this.possibleToWall.size(); i++) {
-            boolean[][] visited = copy(this.visited);
-            makeWall(0, i, visited, wallCheck);
-        }
+        makeWall(0);
     }
 
-    private int[][] makeNewInfectionMap(boolean[][] afterVirus, boolean[][] visited) {
-        int[][] newMap = new int[rowSize][columnSize];
-        for (int i = 0; i < rowSize; i++) {
-            for (int j = 0; j < columnSize; j++) {
-                if (visited[i][j] && map[i][j] == 0) {
-                    newMap[i][j] = 3;
-                } else if (afterVirus[i][j] && map[i][j] == 1) {
-                    newMap[i][j] = 1;
-                } else if (afterVirus[i][j] && map[i][j] == 0 || map[i][j] == 2) {
-                    newMap[i][j] = 2;
-                } else {
-                    newMap[i][j] = 0;
-                }
-            }
-        }
-        return newMap;
-    }
-
-
-    private void makeWall(int numberOfWall, int index, boolean[][] visited, boolean[] wallCheck) {
+    private void makeWall(int numberOfWall) {
         if (numberOfWall == 3) {
-            boolean[][] afterVirusExpansion = expectExpansion(visited);
-            int[][] infectionMap = makeNewInfectionMap(afterVirusExpansion, visited);
+            int[][] infectionMap = expectExpansion();
             calculateSafeZoneArea(infectionMap);
             return;
         }
 
-        for (int i = index; i < this.possibleToWall.size(); i++) {
-            Coordinate next = this.possibleToWall.get(i);
-            if (!wallCheck[i] && !visited[next.getRow()][next.getColum()]) {
-                wallCheck[i] = true;
-                visited[next.getRow()][next.getColum()] = true;
-                makeWall(numberOfWall + 1, i + 1, visited, wallCheck);
-                visited[next.getRow()][next.getColum()] = false;
-                wallCheck[i] = false;
+        for (int i = 0; i < rowSize; i++) {
+            for (int j = 0; j < columnSize; j++) {
+                if (this.map[i][j] == 0) {
+                    this.map[i][j] = 1;
+                    makeWall(numberOfWall + 1);
+                    this.map[i][j] = 0;
+                }
             }
         }
     }
-
     private void calculateSafeZoneArea(int[][] infectionMap) {
         int safeZoneArea = 0;
         for (int i = 0; i < rowSize; i++) {
@@ -125,32 +80,33 @@ class VirusExpansionSimulator {
         this.safeZoneArea = Math.max(this.safeZoneArea, safeZoneArea);
     }
 
-    private boolean[][] expectExpansion(boolean[][] visited) {
-        boolean[][] virusVisited = copy(visited);
-        for (Coordinate eachVirus : this.virus) {
-            if (!virusVisited[eachVirus.getRow()][eachVirus.getColum()]) {
-                virusVisited[eachVirus.getRow()][eachVirus.getColum()] = true;
-                expand(eachVirus, visited, virusVisited);
+    private int[][] expectExpansion() {
+        int[][] copyMap = copy(this.map);
+        for (int i = 0; i < rowSize; i++) {
+            for (int j = 0; j < columnSize; j++) {
+                if (this.map[i][j] == 2) {
+                    expand(i, j, copyMap);
+                }
             }
         }
-        return virusVisited;
+        return copyMap;
     }
 
 
-    private void expand(Coordinate coordinate, boolean[][] visited, boolean[][] virusVisited) {
+    private void expand(int row, int column, int[][] copyMap) {
         Queue<Coordinate> queue = new LinkedList<>();
-        queue.add(coordinate);
+        queue.add(new Coordinate(row, column));
         while (!queue.isEmpty()) {
             Coordinate current = queue.poll();
-            if (visited[current.getRow()][current.getColum()] && map[current.getRow()][current.getColum()] != 2) {
+            if (copyMap[current.getRow()][current.getColum()] == 1) {
                 continue;
             }
             for (int[] move : MOVES) {
                 int nextRow = current.getRow() + move[0];
                 int nextColumn = current.getColum() + move[1];
 
-                if (this.isInMap(nextRow, nextColumn) && !visited[nextRow][nextColumn] && !virusVisited[nextRow][nextColumn]) {
-                    virusVisited[nextRow][nextColumn] = true;
+                if (this.isInMap(nextRow, nextColumn) && copyMap[nextRow][nextColumn] == 0) {
+                    copyMap[nextRow][nextColumn] = 2;
                     queue.offer(new Coordinate(nextRow, nextColumn));
                 }
             }
@@ -164,44 +120,7 @@ class VirusExpansionSimulator {
     public int getSafeZoneArea() {
         return this.safeZoneArea;
     }
-
-    private void printInfectionState(boolean[][] virusVisited, boolean[][] visited) {
-        for (int i = 0; i < rowSize; i++) {
-            for (int j = 0; j < columnSize; j++) {
-                if (visited[i][j] && map[i][j] == 0) {
-                    System.out.printf("%2d", 3);
-                } else if (virusVisited[i][j] && map[i][j] == 1) {
-                    System.out.printf("%2d", 1);
-                } else if (virusVisited[i][j] && map[i][j] == 0 || map[i][j] == 2) {
-                    System.out.printf("%2d", 2);
-                } else {
-                    System.out.printf("%2d", 0);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    private void printState(boolean[][] afterVirus) {
-        for (int i = 0; i < rowSize; i++) {
-            for (int j = 0; j < columnSize; j++) {
-                if (afterVirus[i][j] && map[i][j] == 0) {
-                    System.out.printf("%2d", 3);
-                } else if (afterVirus[i][j] && map[i][j] == 2) {
-                    System.out.printf("%2d", 2);
-                } else if (afterVirus[i][j] && map[i][j] == 1) {
-                    System.out.printf("%2d", 1);
-                } else {
-                    System.out.printf("%2d", 0);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
 }
-
 class Coordinate {
     private final int row;
     private final int colum;
