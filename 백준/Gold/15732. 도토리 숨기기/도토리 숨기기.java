@@ -4,13 +4,16 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
+    private static int n;
+    private static int k;
+    private static Rule[] rules;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int k = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        k = Integer.parseInt(st.nextToken());
         long d = Integer.parseInt(st.nextToken());
-        Rule[] rules = new Rule[k];
+        rules = new Rule[k];
         for (int i = 0; i < k; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
@@ -22,7 +25,7 @@ public class Main {
         int end = n;
         while (start <= end) {
             int mid = (start + end) / 2;
-            long res = addCount(mid, k, rules);
+            long res = addCount(mid);
             if (res >= d) {
                 end = mid - 1;
             } else {
@@ -32,7 +35,7 @@ public class Main {
         System.out.println(start);
         br.close();
     }
-    public static long addCount(int mid, int k, Rule[] rules){
+    public static long addCount(int mid){
         long cnt = 0;
         for (int i = 0; i < k; i++) {
             if(mid < rules[i].getStart()){
