@@ -28,7 +28,7 @@ public class Main {
             activateCost[i] = Integer.parseInt(st.nextToken());
             totalCost+=activateCost[i];
         }
-        int[] cost = new int[10_000_000];
+        int[] cost = new int[totalCost+1];
         for (int i = 0; i < n; i++) {
             for (int k = totalCost; k >= activateCost[i]; k--) {
                 cost[k] = Math.max(cost[k], cost[k - activateCost[i]] + apps[i]);
