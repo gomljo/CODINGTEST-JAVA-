@@ -31,7 +31,7 @@ public class Main {
         while (!queue.isEmpty()) {
             Player player = queue.poll();
             if (player.getPosition() == 100) {
-                count = Math.min(count, player.getCount());
+                count = player.getCount();
                 break;
             }
             for (int d : DICE) {
