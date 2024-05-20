@@ -21,7 +21,7 @@ public class Main {
             int numberOfWarmHole = Integer.parseInt(st.nextToken());
 
             dist = new int[numberOfNode + 1];
-            List<List<Edge>> graph = new ArrayList<>();
+            List<List<Edge2>> graph = new ArrayList<>();
             for (int j = 0; j <= numberOfNode; j++) {
                 graph.add(new ArrayList<>());
             }
@@ -30,71 +30,67 @@ public class Main {
                 int start = Integer.parseInt(st.nextToken());
                 int end = Integer.parseInt(st.nextToken());
                 int time = Integer.parseInt(st.nextToken());
-                graph.get(start).add(new Edge(start, end, time));
-                graph.get(end).add(new Edge(end, start, time));
+                graph.get(start).add(new Edge2(start, end, time));
+                graph.get(end).add(new Edge2(end, start, time));
             }
             for (int j = 0; j < numberOfWarmHole; j++) {
                 st = new StringTokenizer(br.readLine());
                 int start = Integer.parseInt(st.nextToken());
                 int end = Integer.parseInt(st.nextToken());
                 int time = Integer.parseInt(st.nextToken());
-                graph.get(start).add(new Edge(start, end, time * -1));
+                graph.get(start).add(new Edge2(start, end, time * -1));
             }
-            sb.append(bellmanFord(numberOfNode, graph) ? "YES\n" : "NO\n");
+            String answer = "NO\n";
+            boolean isCycle =false;
+            int[] time = new int[numberOfNode + 1];
+            Arrays.fill(time, 987654321);
+            time[1] = 0;
+            boolean isUpdate = false;
+            for (int j = 1; j < numberOfNode ; j++) {
+                isUpdate = false;
 
+                for (int k = 1; k <= numberOfNode; k++) {
+                    for (Edge2 edge : graph.get(k)) {
+                        if (time[edge.getEnd()] > time[k] + edge.getTime()){
+                            time[edge.getEnd()] = time[k] + edge.getTime();
+                            isUpdate = true;
+                        }
+                    }
+                }
+                if(!isUpdate){
+                    break;
+                }
+            }
+            if(isUpdate){
+                for (int k = 1; k <= numberOfNode; k++) {
+                    for (Edge2 edge : graph.get(k)) {
+                        if (time[edge.getEnd()] > time[k] + edge.getTime()) {
+                            isCycle = true;
+                            break;
+                        }
+                    }
+                    if(isCycle){
+                        break;
+                    }
+                }
+            }
+            if(isCycle){
+                answer = "YES\n";
+            }
+            sb.append(answer);
         }
         System.out.println(sb);
 
         br.close();
     }
-
-    public static boolean bellmanFord(int N, List<List<Edge>> graph) {
-        Arrays.fill(dist, 987654321);
-        dist[1] = 0; // 시작점은 0으로 초기화.
-        boolean update = false;
-
-        // (정점의 개수 - 1)번 동안 최단거리 초기화 작업을 반복함.
-        for (int i = 1; i < N; i++) {
-            update = false;
-
-            // 최단거리 초기화.
-            for (int j = 1; j <= N; j++) {
-                for (Edge road : graph.get(j)) {
-                    if (dist[road.getEnd()] > dist[j] + road.getTime()) {
-                        dist[road.getEnd()] = dist[j] + road.getTime();
-                        update = true;
-                    }
-                }
-            }
-
-            // 더 이상 최단거리 초기화가 일어나지 않았을 경우 반복문을 종료.
-            if (!update) {
-                break;
-            }
-        }
-
-        // (정점의 개수 - 1)번까지 계속 업데이트가 발생했을 경우
-        // (정점의 개수)번도 업데이트 발생하면 음수 사이클이 일어난 것을 의미함.
-        if (update) {
-            for (int i = 1; i <= N; i++) {
-                for (Edge road : graph.get(i)) {
-                    if (dist[road.getEnd()] > dist[i] + road.getTime()) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
 }
 
-class Edge {
+class Edge2 {
     private final int start;
     private final int end;
     private final int time;
 
-    public Edge(int start, int end, int time) {
+    public Edge2(int start, int end, int time) {
         this.start = start;
         this.end = end;
         this.time = time;
