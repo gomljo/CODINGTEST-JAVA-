@@ -9,22 +9,18 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numberOfTestCases; i++) {
             int n = scanner.nextInt();
-            long[][] dp = new long[n + 1][10];
-            for (int j = 0; j < 10; j++) {
-                dp[1][j] = 1;
+            long[][] dp = new long[n + 1][11];
+            for (int j = 0; j <= 10; j++) {
+                dp[0][j] = 1;
             }
-            for (int j = 2; j <=n; j++) {
-                for (int k = 0; k < 10; k++) {
-                    for (int l = k; l < 10; l++) {
-                        dp[j][k] += dp[j-1][l];
-                    }
+            for (int j = 1; j <=n; j++) {
+                for (int k = 1; k <= 10; k++) {
+                    dp[j][k] = dp[j][k-1] + dp[j-1][k];
                 }
             }
-            long answer = Arrays.stream(dp[n]).sum();
-            sb.append(answer+"\n");
+            sb.append(dp[n][10]).append("\n");
         }
         System.out.println(sb);
         scanner.close();
     }
-
 }
